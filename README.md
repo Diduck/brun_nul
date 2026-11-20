@@ -181,3 +181,38 @@ Une moquerie aléatoire est affichée **une fois sur trois** où le bouton prend
 - **Accessibilité** : le bouton est volontairement inutilisable au clavier et au tactile pour les besoins de la blague. À ne pas réutiliser tel quel dans un vrai formulaire.
 - Les textes sont en français (`lang="fr"`) et les chaînes sont écrites directement dans les fichiers, sans système de traduction.
 - `position: fixed` + `overflow: hidden` : sur de très petits écrans, la fenêtre de rédaction peut occuper presque tout l'espace.
+# How to run
+There are 2 ways to run this project :
+Both have these requirements :
+- Docker
+- Internet access
+
+## Run it for testing
+
+Create a .env file at the root of the project folder with a content like this : **Replace the port number by the chosen port number to access the app**.
+
+```
+DEV_PORT=8081
+```
+Then run :
+```bash
+docker compose -f dev-compose.yml up -d --build
+```
+## Run it for production
+
+Create a .env file at the root of the project folder with a content like this : **Replace the port number by the chosen port number to access the app**.
+
+```
+PROD_PORT=8080
+```
+
+Then run :
+```bash
+docker compose -f prod-compose.yml up -d --build
+```
+
+# VM setup
+
+The VM where the runner runs has been setup with docker rootless. It is not possible to bind prots under 1024 with the runner.
+
+The github runner has been installed on the user "valentin" in `/home/valentin/`
