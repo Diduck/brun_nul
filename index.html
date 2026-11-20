@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Boîte Mail</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="logo">✉️ <span>MaBoîte</span></div>
+    <input class="search" type="text" placeholder="Rechercher dans les messages" disabled>
+    <div class="avatar">M</div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <button class="compose-btn" disabled>✏️ Nouveau message</button>
+      <nav>
+        <a class="active">📥 Boîte de réception <span class="count">42</span></a>
+        <a>⭐ Suivis</a>
+        <a>📤 Envoyés</a>
+        <a>📝 Brouillons <span class="count">1</span></a>
+        <a>🗑️ Corbeille</a>
+      </nav>
+    </aside>
+
+    <main class="inbox">
+      <ul class="mail-list">
+        <li><b>Boss</b> — Réunion à 7h demain, soyez à l'heure <span>08:12</span></li>
+        <li><b>RH</b> — Rappel : les congés sont refusés jusqu'en 2031 <span>Hier</span></li>
+        <li><b>Boss</b> — Re: Re: Re: Heures sup ce week-end <span>Hier</span></li>
+        <li><b>Compta</b> — Votre prime a été annulée <span>Lun.</span></li>
+      </ul>
+    </main>
+  </div>
+
+  <!-- Fenêtre de rédaction -->
+  <section class="compose" id="compose">
+    <div class="compose-header">
+      <span>Nouveau message</span>
+      <span class="compose-icons">_ ⤢ ✕</span>
+    </div>
+    <div class="field"><label>À</label><input type="text" value="boss@gmail.com" readonly></div>
+    <div class="field"><label>Objet</label><input type="text" value="Ma démission" readonly></div>
+    <textarea readonly>Bonjour,
+
+Je vous informe par la présente de ma décision de démissionner de mon poste, avec effet immédiat.
+
+Je tiens à vous remercier pour toutes ces réunions à 7h du matin, ces week-ends passés au bureau et ces primes qui n'ont jamais existé. Ce fut une expérience… formatrice.
+
+Je vous souhaite bonne continuation, et bon courage pour trouver quelqu'un d'aussi patient que moi.
+
+Cordialement,
+Un ex-employé libre</textarea>
+
+    <div class="compose-footer">
+      <button class="send-btn" id="sendBtn">Envoyer ➤</button>
+      <span class="hint" id="hint">Il ne reste plus qu'à cliquer…</span>
+    </div>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>
