@@ -15,7 +15,7 @@ Then run :
 ```bash
 docker compose -f dev-compose.yml up -d --build
 ```
-## Run it for testing
+## Run it for production
 
 Requirement :
 
