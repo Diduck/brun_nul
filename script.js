@@ -7,13 +7,14 @@ const PUSH = 6;         // force de répulsion
 const FRICTION = 0.86;  // amortissement (plus proche de 1 = plus glissant)
 const SPRING = 0.004;   // force qui ramène le bouton à sa place quand on s'éloigne
 const MARGIN = 10;      // marge avec les bords de l'écran
+const BOOST = 9;        // accélération quand il est coincé contre un bord
 
 const taunts = [
   "Hé ! Pas si vite…",
   "Tu es sûr(e) de toi ?",
   "Pense au ticket resto…",
   "Le boss a l'air sympa en fait, non ?",
-  "Raté 😏",
+  "Raté",
   "Encore un petit effort… ou pas.",
   "Le bouton a peur du chômage.",
   "Tu n'y arriveras jamais !",
@@ -31,25 +32,20 @@ function taunt(text) {
   hint.textContent = text || taunts[Math.floor(Math.random() * taunts.length)];
 }
 
-// Téléporte le bouton loin du pointeur quand il est coincé
-function teleport() {
-  const maxX = window.innerWidth - home.width - MARGIN;
-  const maxY = window.innerHeight - home.height - MARGIN;
-  let x, y, tries = 0;
-  do {
-    x = MARGIN + Math.random() * (maxX - MARGIN);
-    y = MARGIN + Math.random() * (maxY - MARGIN);
-    tries++;
-  } while (Math.hypot(x + home.width / 2 - mx, y + home.height / 2 - my) < RADIUS * 2 && tries < 50);
+// Direction de fuite le long d'un mur : à l'opposé du pointeur,
+// ou vers le centre de l'écran si le pointeur est pile en face
+function slideDir(btnPos, mousePos, screenSize) {
+  const d = btnPos - mousePos;
+  if (Math.abs(d) > 8) return Math.sign(d);
+  return Math.sign(screenSize / 2 - btnPos) || 1;
+}
 
-  btn.classList.add("blink");
-  setTimeout(() => {
-    ox = x - home.left;
-    oy = y - home.top;
-    vx = vy = 0;
-    btn.classList.remove("blink");
-  }, 120);
-  taunt("Pouf ! 💨");
+// Grosse impulsion pour s'éloigner (clic ou clavier), sans jamais quitter l'écran
+function dash() {
+  const cx = home.left + ox + home.width / 2;
+  const cy = home.top + oy + home.height / 2;
+  vx += slideDir(cx, mx, window.innerWidth) * 40;
+  vy += slideDir(cy, my, window.innerHeight) * 40;
 }
 
 function tick() {
@@ -89,14 +85,28 @@ function tick() {
   const maxOx = window.innerWidth - home.width - MARGIN - home.left;
   const minOy = MARGIN - home.top;
   const maxOy = window.innerHeight - home.height - MARGIN - home.top;
-  let pinned = false;
-  if (ox < minOx) { ox = minOx; vx *= -0.5; pinned = true; }
-  if (ox > maxOx) { ox = maxOx; vx *= -0.5; pinned = true; }
-  if (oy < minOy) { oy = minOy; vy *= -0.5; pinned = true; }
-  if (oy > maxOy) { oy = maxOy; vy *= -0.5; pinned = true; }
+  let pinnedX = false, pinnedY = false;
+  if (ox <= minOx) { ox = minOx; vx = Math.max(vx, 0) * 0.3; pinnedX = true; }
+  if (ox >= maxOx) { ox = maxOx; vx = Math.min(vx, 0) * 0.3; pinnedX = true; }
+  if (oy <= minOy) { oy = minOy; vy = Math.max(vy, 0) * 0.3; pinnedY = true; }
+  if (oy >= maxOy) { oy = maxOy; vy = Math.min(vy, 0) * 0.3; pinnedY = true; }
 
-  // Coincé contre un mur avec le pointeur collé dessus : on s'échappe
-  if (pinned && edgeDist < 35) teleport();
+  // Coincé contre un mur : il glisse le long du mur, de plus en plus vite
+  // à mesure que le pointeur se rapproche
+  if ((pinnedX || pinnedY) && edgeDist < RADIUS) {
+    const k = 1 - edgeDist / RADIUS;
+    const boost = BOOST * k;
+    const bx = home.left + ox + home.width / 2;
+    const by = home.top + oy + home.height / 2;
+
+    let slideAlongY = pinnedX;
+    if (pinnedX && pinnedY) {
+      // Dans un coin : on longe le mur le plus éloigné du pointeur
+      slideAlongY = Math.abs(bx - mx) > Math.abs(by - my);
+    }
+    if (slideAlongY) vy += slideDir(by, my, window.innerHeight) * boost;
+    else vx += slideDir(bx, mx, window.innerWidth) * boost;
+  }
 
   // Légère inclinaison selon la vitesse, pour un effet vivant
   const tilt = Math.max(-15, Math.min(15, vx * 1.5));
@@ -124,15 +134,15 @@ btn.addEventListener("focus", () => {
   btn.blur();
   const r = btn.getBoundingClientRect();
   mx = r.left + r.width / 2; my = r.top + r.height / 2;
-  teleport();
-  taunt("Le clavier ? Bien essayé 😉");
+  dash();
+  taunt("Le clavier ? Bien essayé");
 });
 
 // Au cas où quelqu'un réussirait quand même à cliquer
 btn.addEventListener("click", (e) => {
   e.preventDefault();
   mx = e.clientX; my = e.clientY;
-  teleport();
+  dash();
   taunt("Presque ! Mais non.");
 });
 
