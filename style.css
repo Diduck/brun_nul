@@ -141,9 +141,7 @@ body {
   position: relative;
   z-index: 1000;
   will-change: transform;
-  transition: opacity .12s;
 }
-.send-btn.blink { opacity: 0; }
 
 .hint { font-size: 13px; color: #5f6368; font-style: italic; }
 
