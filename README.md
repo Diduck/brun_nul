@@ -19,7 +19,11 @@ docker compose -f dev-compose.yml up -d --build
 
 Requirement :
 
-- port 8080 available
+Create a .env file at the root of the project folder with a content like this : **Replace the port number by the chosen port number to access the app**.
+
+```
+PROD_PORT=8080
+```
 
 Then run :
 ```bash
